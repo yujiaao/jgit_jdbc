@@ -53,9 +53,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import org.eclipse.jgit.generated.storage.dht.proto.GitStore;
 import org.eclipse.jgit.storage.dht.AsyncCallback;
 import org.eclipse.jgit.storage.dht.ChunkKey;
-import org.eclipse.jgit.storage.dht.ChunkMeta;
+
 import org.eclipse.jgit.storage.dht.DhtException;
 import org.eclipse.jgit.storage.dht.PackChunk.Members;
 import org.eclipse.jgit.storage.dht.spi.ChunkTable;
@@ -111,7 +112,7 @@ public class JdbcChunkTable extends JdbcSqlHelper implements ChunkTable {
 						if (chunkIdx != null && chunkIdx.length > 0)
 							member.setChunkIndex(chunkIdx);
 						if (chunkMeta != null && chunkMeta.length > 0)
-							member.setMeta(ChunkMeta.fromBytes(chunkKey,
+							member.setMeta(GitStore.ChunkMeta.parseFrom(chunkKey,
 									chunkMeta));
 						memberList.add(member);
 					}
@@ -148,7 +149,7 @@ public class JdbcChunkTable extends JdbcSqlHelper implements ChunkTable {
 				} else {
 					// Assume update of ChunkIndex and ChunkMeta
 					final byte[] chunkIdx = chunk.getChunkIndex();
-					final ChunkMeta chunkMeta = chunk.getMeta();
+					final GitStore.ChunkMeta chunkMeta = chunk.getMeta();
 					final PreparedStatement stmt = conn
 							.prepareStatement(UPDATE_IN_CHUNK);
 					stmt.setBytes(1, chunkIdx != null ? chunkIdx : new byte[0]);
